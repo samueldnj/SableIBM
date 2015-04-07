@@ -65,7 +65,7 @@ inletFishIdx <- appendedList $ inletFishIdx
 sampSizes <- c ( 10, 25, 50, 100, 250, 500, 1000 )
 
 # Choose number of samples
-nSamples <- 100
+nSamples <- 25
 
 # The following will perform the comparison of habitats for a given number
 # of samples of a given size. It works in parallel to speed things up.
@@ -75,8 +75,8 @@ clusterExport ( cl = clust, varlist = c ( "simCtl", "detCtl" ) )
 
 # Call wrapper functions through lapply. This will return a list with an entry
 # for each sample size, each a list of nSamples results.
-sampList <- lapply (   X = sampSizes, FUN = sampSizeFun, nSamp = nSamples, 
-                       detDT = yearDetections [[ 1 ]],
+sampList <- parLapply ( cl = clust,  X = sampSizes, fun = sampSizeFun, 
+                        nSamp = nSamples, detDT = yearDetections [[ 1 ]],
                        idx = inletFishIdx, states = F )
 
 # Stop cluster
@@ -84,7 +84,7 @@ stopCluster ( clust )
 
 # Comparison timing
 compTime <- proc.time () - ptm
-cat ( " The comparison process took: " ptm )
+cat ( " The comparison process took: ", compTime )
 
 # Write output to file
 save ( sampList, file = "sample.RData" )
