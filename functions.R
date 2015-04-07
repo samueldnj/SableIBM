@@ -1422,8 +1422,38 @@ compareFunc <- function ( N = 20, detections = yearDetections [[ 1 ]],
 sampSizeFun <- function ( sampleSize = 25, nSamp = nSamples, 
                           detDT = yearDetections [[ 1 ]],
                           idx = inletFishIdx, states = F )
-{
-  areasArray <- parSapply ( cl = clust, X = 1:nSamp, 
+{ 
+  # # Count inlets
+  # nInlets <- length ( idx )  
+
+  # # Create a matrix to hold fish sample numbers
+  # sampMat <- matrix ( 0, nrow = nSamples, ncol = sampleSize * nInlets )
+
+  # for ( i in 1:nSamples )
+  # {
+
+  #   # Take samples in each inlet
+  #   # Make matrix to hold samples
+  #   fishSamp <- matrix ( 0, nrow = nInlets, ncol = sampleSize )
+
+  #   # Take samples
+  #   for ( i in 1:nInlets )
+  #   { 
+  #     ind <- indices [[ i ]][[ 1 ]]
+  #     fishSamp [ i, ] <- sample ( x = ind, size = sampleSize )
+  #   }
+
+  #   # Aggregate into a vector
+  #   aggSamp <- as.vector ( fishSamp )
+  #   sampMat [ i, ] <- aggSamp
+  # }
+
+  # areasArray <- parApply ( cl = clust, X = sampMat, MARGIN = 1,
+  #                           FUN = repWrapper, )
+  source ( "parFunctions.R" )
+  require ( adehabitat )
+ 
+  areasArray <- sapply ( X = 1:nSamp, 
                             FUN = repWrapper, 
                             sampSize = sampleSize, det = detDT,
                             idx = idx, stateVars = states,
