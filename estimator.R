@@ -62,7 +62,7 @@ inletFishIdx <- appendedList $ inletFishIdx
 # the overlap - didn't work right now, get back to that later
 
 # Choose sample sizes - as size increases independence drops
-sampSizes <- c ( 10, 25, 50, 100, 250, 500, 1000 )
+sampSizes <- c ( 10, 25, 50, 100, 250 )
 
 # Choose number of samples
 nSamples <- 25
@@ -70,7 +70,7 @@ nSamples <- 25
 # The following will perform the comparison of habitats for a given number
 # of samples of a given size. It works in parallel to speed things up.
 ptm <- proc.time ( )
-clust <- makeCluster ( spec = nCores)
+clust <- makeCluster ( spec = min ( nCores, length ( sampSizes ) ) )
 clusterExport ( cl = clust, varlist = c ( "simCtl", "detCtl" ) )
 
 # Call wrapper functions through lapply. This will return a list with an entry
