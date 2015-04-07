@@ -22,10 +22,11 @@
 rm ( list = ls ( ) )
 
 # Load required packages
-require ( animation ); require ( data.table );
+require ( animation ); require ( data.table ); require ( adehabitat )
 
 # Load functions
 source ( "functions.R" )
+load ( "bathyTop.RData" )
 
 # Load detections control file for RData file paths
 detCtl <- lisread ( "detections.ctl" )
@@ -36,21 +37,24 @@ load ( file = detCtl $ inputFish )
 load ( file = detCtl $ inputBoats )
 load ( file = detCtl $ inputDetections )
 
+B <- fishingYears [[ 1 ]] $ B
+nB <- dim ( B ) [ 3 ]
+
 # Let's try to save a short movie of the fish moving around
 saveGIF ( 
 {
-  par ( bg = NA )
-  for ( i in 1:100 ) 
-  { plot (  x = F[ 1:1000, 1, ( i - 1 ) * 20 + 1 ],
-            y = F[ 1:1000, 2, ( i - 1 ) * 20 + 1 ],
-            xlim = c ( -134, -124 ),
-            ylim = c ( 48, 56 ),
-            las = 1,
-            cex = 0.01,
-            col = "red" )
+  for ( i in 1:500 ) 
+  { image ( bathyTop, col = bgPal) 
+    points (  x = F [ 1:1000, 1, ( i - 1 ) * 20 + 1 ],
+              y = F [ 1:1000, 2, ( i - 1 ) * 20 + 1 ],
+              cex = 0.1,
+              col = "tomato" )
+    points ( x = B [ 1, ( i - 1 ) * 20 + 1, 1:nB ],
+             y = B [ 2, ( i - 1 ) * 20 + 1, 1:nB ],
+             cex = 0.5, col = "whitesmoke" )
     ani.pause ( )
   }
-}, movie.name = "FishOverlay.gif", interval = 0.1, nmax = 500, ani.width = 600,
-ani.height = 480 )
+}, movie.name = "FishMove.gif", interval = 0.1, nmax = 500, ani.width = 1200,
+ani.height = 960 )
 
 
