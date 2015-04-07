@@ -62,7 +62,8 @@ inletFishIdx <- appendedList $ inletFishIdx
 # the overlap - didn't work right now, get back to that later
 
 # Choose sample sizes - as size increases independence drops
-sampSizes <- c ( 10, 25, 50, 100, 250, 500, 1000 )
+# sampSizes <- c ( 10, 25, 50, 100, 250, 500, 1000 )
+sampSizes <- c ( 25, 50, 100, 250, 500, 1000 )
 
 # Choose number of samples
 nSamples <- 100
@@ -84,7 +85,7 @@ stopCluster ( clust )
 
 # Comparison timing
 compTime <- proc.time () - ptm
-cat ( " The comparison process took: " ptm )
+cat ( " The comparison process took: ", ptm )
 
 # Write output to file
 save ( sampList, file = "sample.RData" )
