@@ -29,18 +29,24 @@
 # Housekeeping
 rm ( list = ls( ) )
 
+# load packages
+require ( parallel ); require ( foreach ); require ( dplyr ); 
+require ( PBSmapping ); require ( doParallel ); require ( data.table );
+require ( stringr )
+
 #### Load bathymetry #### 
 # if no RData file is available, source bathymetry.R - time expensive!
 # source ( "bathymetry.R" )
 load ( file = "bathyTop.RData" )
 # If histAveByYear.RData is not available, uncomment and run histAnalysis.R
+# to compute historical yearly averages for trip lengths and frequency.
 # source ( "histAnalysis.R" )
 load ( file = "histAveByYear.RData" )
 
-# load packages
-require ( parallel ); require ( foreach ); require ( dplyr ); 
-require ( PBSmapping ); require ( doParallel ); require ( data.table );
-require ( stringr )
+# Read in historical fishing locations, for more realistic pressure.
+trawlHist <- read.table ( "TrawlFisheries_not4B.txt", header = TRUE )
+trawlHist <- as.data.table ( trawlHist )
+
 
 # Source functions from separate script
 source ( "functions.R" )

@@ -32,8 +32,7 @@ detCtl <- lisread ( "detections.ctl" )
 simCtl <- lisread ( "simulator.ctl" )
 
 # Load output of simulator.R
-load ( file = detCtl $ inputFish )
-load ( file = detCtl $ inputBoats )
+load ( file = detCtl $ inputSim )
 
 # Recover number of time steps, number of fish
 nT <- simCtl $ nT

@@ -32,8 +32,7 @@ detCtl <- lisread ( "detections.ctl" )
 simCtl <- lisread ( "simulator.ctl" )
 
 # Uncomment to load data from simulator
-load ( file = detCtl $ inputFish )
-load ( file = detCtl $ inputBoats )
+load ( file = detCtl $ inputSim )
 load ( file = detCtl $ inputDetections )
 load ( file = "bathyTop.RData" )
 

@@ -13,7 +13,7 @@
 ###############################
 ## Number of time steps
 # nT
-2000
+20
 
 ## Number of cores for parallelism
 # nCores
@@ -33,7 +33,7 @@
 
 ## Number of fish to simulate
 # nF
-1000
+10
 
 ## Random fish jump parameters ##
 ## Jump distance
