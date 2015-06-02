@@ -164,7 +164,8 @@ print ( boatTime )
 # Make unique identifier for system time
 splitTime <- str_split ( string = Sys.time ( ), pattern = " " )[[1]]
 timeStampChar <- paste ( splitTime[1], splitTime[2], sep = "-" )
-filename <- paste ( "Output/simOut-", timeStampChar, ".RData", sep = "" )
+# filename <- paste ( "Output/simOut-", timeStampChar, ".RData", sep = "" )
+filename <- "Output/simOut.RData"
 save ( F, fishingYears, file = filename )
 
 

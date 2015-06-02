@@ -13,7 +13,7 @@
 ###############################
 ## Number of time steps
 # nT
-12410
+2000
 
 ## Number of cores for parallelism
 # nCores

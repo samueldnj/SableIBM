@@ -55,5 +55,6 @@ for ( i in 1:length ( fishingYears ) )
 # Make unique identifier from system time
 splitTime <- str_split ( string = Sys.time ( ), pattern = " " )[[1]]
 timeStampChar <- paste ( splitTime[1], splitTime[2], sep = "-" )
-filename <- paste ( "Output/detections-", timeStampChar, ".RData", sep = "" )
+# filename <- paste ( "Output/detections-", timeStampChar, ".RData", sep = "" )
+filename <- "Output/detOut.RData"
 save ( yearDetections, file = filename )

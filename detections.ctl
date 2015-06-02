@@ -13,11 +13,9 @@
 ###############################
 
 ## Input file paths
-# inputFish
-"Output/1000F12410T.RData"
-
-# inputBoats
-"Output/Boats.RData"
+# inputSim
+"Output/TestSableAGM.RData"
+## "Output/simOut.RData"
 
 # inputDetections
 "Output/yearDet.RData"

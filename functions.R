@@ -800,13 +800,13 @@ fishJumps <- function ( oldPos = c ( 0, 0 ), sigmaT = pi/3, meanD = 0.01,
     Theta <- rnorm ( n = 1, mean = muTheta, sd = sigmaT )
     Dist <- rnorm ( n = 1, mean = meanD, sd = sigmaD )
 
-    # Now convert back to cartisian coordinates
+    # Now convert back to cartesian coordinates
     delta <- pol2cart ( r = Dist, t = Theta ) 
 
     # If still in inlet, add a potential to overcome depth preference
     # Border across which potential function turns off
     # y = -6/7 * x - 405/7
-    if ( Yt >= -6/7 * Xt - 405 / 7 )
+    if ( Yt >= -6/7 * Xt - 409 / 7 )
     {
       # Create complex numbers out of current location and the potential
       # location
@@ -865,6 +865,7 @@ listElement <- function ( entry = 1, listVec, element = 1 )
   return ( out )
 }
 
+
 boatDEVS <- function ( boat = 1, histData = histList, T = nT )
 {
   # Source functions needed in parallel running
@@ -907,7 +908,7 @@ boatDEVS <- function ( boat = 1, histData = histList, T = nT )
 
   # 3a. Create first event, add to FEL
   # Generate a timestamp - make Poisson so it happens realistically early
-  tFirst <- rpois ( n = 1, lambda = layOver )
+  tFirst <- runif ( n = 1, min = 1, max = min ( T, 500 ) )
 
   # First event type
   eFirst <- fishing
@@ -1414,6 +1415,101 @@ compareFunc <- function ( N = 20, detections = yearDetections [[ 1 ]],
   }
 
   return ( areas )
+}
+
+# Function to randomly sample fish and compare detections
+# to true home range - for aggregate samples and inlet specific
+# fish.
+#   Arguments:         N = sample size
+#             detections = detection data to use (based on historic fishing
+#                          effort)
+#                indices = indices of fish in each inlet - bad planning
+#                 states = array of fish state variables
+#   Returns:   areaPolys = list of estimated and simulated habitat polygons
+polyFunc <- function ( N = 20, detections = yearDetections [[ 1 ]],
+                          indices = inletFishIdx, states = F )
+{
+  # Count inlets
+  nInlets <- length ( indices )
+
+  # Take samples in each inlet
+  # Make matrix to hold samples
+  fishSamp <- matrix ( 0, nrow = nInlets, ncol = N )
+
+  # Take samples
+  for ( i in 1:nInlets )
+  { 
+    idx <- indices [[ i ]][[ 1 ]]
+    fishSamp [ i, ] <- sample ( x = idx, size = N )
+  }
+
+  # Aggregate into a vector
+  aggSamp <- as.vector ( fishSamp )
+
+  # Reduce state array and detections table to sample
+  sampF <- states [ aggSamp, , ]
+  setkey ( detections, fish.number )
+  sampDet <- detections [ J ( aggSamp ) ]
+
+  # Need to create a data.table of locations for fish in aggSamp. Use lapply
+  # on trueLocs to get one dt for each fish
+  trueList <- lapply ( X = aggSamp, FUN = trueLocs, nT = simCtl $ nT, 
+                       states = states )
+
+  # Bind them together into one dt
+  trueDT <- rbindlist ( trueList )
+  trueDT [ , agg := 1]
+
+  # And now we need to take the initial locations and add them to the detections
+  # Recover tagging locations
+  taggLocs <- trueDT [ time.stamp == 1 ]
+
+  # Bind to sampDet
+  sampDet <- rbind ( sampDet, taggLocs, use.names = FALSE )
+
+  # Oki doke, now we can start comparing habitat areas. Polygons are for plotting
+  # later, so we can keep these out of the analysis for now.
+  # Find area of MCP around detections of aggregate sample
+  mcpAggDet <- mcp ( xy = sampDet [ ,  c("boat.lat", "boat.lon"), 
+                                                with = FALSE ], 
+                     id = sampDet [ , agg ], percent = 100 )
+  # Find area of MCP of true locations of agg sample
+  mcpAggTrue <- mcp (  xy = trueDT [ , c("fish.lat", "fish.lon"), 
+                                                 with = FALSE ], 
+                                id = trueDT [ , agg ],
+                                percent = 100 )
+
+  agg <- list ( )
+  agg $ detPoly <- mcpAggDet
+  agg $  truePoly <- mcpAggTrue
+
+  polyList <- vector ( mode = "list", length = nInlets + 1 )
+
+  polyList [[ 1 ]] <- agg
+
+  
+  for ( i in 1:nInlets )
+  {
+    # Reduce to fish from inlet i
+    sampDetInlet <- sampDet [ inlet == i ]
+    trueDTInlet <- trueDT [ inlet == i ]
+
+    # Find area of minimal convex polygon around detections
+    mcpDetInlet <- mcp ( xy = sampDetInlet [ ,  c("boat.lat", "boat.lon"),
+                                                      with = FALSE ],
+                                  id = sampDetInlet [ , agg ], 
+                                  percent = 100 )
+    # Find area of MCP around true locations
+    mcpTrueInlet <- mcp (  xy = trueDTInlet [ , c( "fish.lat", 
+                                                            "fish.lon" ),
+                                                       with = FALSE ],
+                                    id = trueDTInlet [ , agg ],
+                                    percent = 100 )
+    # Fill row of areas matrix
+    polyList [[ i + 1 ]] <- list ( mcpDetInlet, mcpTrueInlet )
+  }
+
+  return ( polyList )
 }
 
 # The following functions are wrappers for the compareFunc function,

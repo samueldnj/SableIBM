@@ -88,3 +88,35 @@ cat ( " The comparison process took: ", compTime )
 
 # Write output to file
 save ( sampList, file = "sample.RData" )
+
+
+# Now compute the mcp of habitat from detections and simuations for each sample
+# size
+polys <- lapply ( X = sampSizes, FUN = polyFunc, 
+                  detections = yearDetections [[ 1 ]],
+                  indices = inletFishIdx, states = F )
+
+save ( polys, file = "polyData.RData" )
+
+# And get the polys and area for all fish
+# Pull out detections
+detections <- yearDetections [[ 1 ]]
+
+# Make detections polygon
+allPolyDet <- mcp ( xy = detections [ , c("boat.lon", "boat.lat" ), 
+                                      with = FALSE ],
+                    id = detections [ , agg ], percent = 100 )
+
+# Create a data.table of the true locations
+trueDT <- lapply ( X = 1:10000, FUN = trueLocs, nT = simCtl $ nT, 
+                       states = F )
+
+trueDT <- rbindlist ( trueDT )
+trueDT [ , agg := 1 ]
+
+# Make polygon for true locations
+allPolyTrue <- mcp ( xy = detections [ , c("boat.lon", "boat.lat" ), 
+                                      with = FALSE ],
+                    id = detections [ , agg ], percent = 100 )
+
+save ( allPolyDet, allPolyTrue, file = "allPoly.RData" )

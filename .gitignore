@@ -1,3 +1,11 @@
 # Ignore Output Files
 Output/*
 Output/*.*
+
+# Ignore images
+*.gif
+*.png
+*.pdf
+
+# Ignore R app history
+.Rapp.history
