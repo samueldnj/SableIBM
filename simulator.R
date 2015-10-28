@@ -158,7 +158,7 @@ for ( i in 1:length ( years ) )
 
   # Fill vector list with state vectors and FELs
   fishingYears [[ i ]] <- yearDEVS ( dt = FishByYear [ year == years [ i ], ], 
-                                     T = nT )  
+                                     T = nT, tHist = trawlHist )  
 }
 boatTime <- proc.time ( ) - ptm
 

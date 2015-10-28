@@ -878,6 +878,7 @@ boatDEVS <- function ( boat = 1, histData = histList, T = nT )
   layOver <- histData $ layOver
   meanEventTime <- histData $ meanEventTime 
   meanTows <- histData $ meanTows 
+  tHist <- histData $ tHist
 
   # Create 2D array to hold states for each boat
   # First, names for dimensions
@@ -975,10 +976,24 @@ boatDEVS <- function ( boat = 1, histData = histList, T = nT )
 #   Args:   dt = a line of a data.table of yeardata, as produced by
 #                 histAnalysis.R
 #   Rets:  out = a list containing a system state array and a FEL
-yearDEVS <- function ( dt = yearAverages, T = nT )
+yearDEVS <- function ( dt = FishByYear [ 1, ], T = nT, tHist = trawlHist )
 {
+  # Recover fishing year
+  year <- dt $ year
+
+  # Split up fishing year
+  years <- str_split ( string = year, pattern = "/" )
+  year <- as.integer ( years [[ 1 ]] [ 2 ] )
+
+  # Reduce tHist to relevant years
+  tHist <- tHist [ StartYear == year ]
+
+  # Recover vector of vessel IDs
+  boatIDs <- unique ( tHist [ , VESSEL_ID ] )
+
   # Recover number of boats
-  nB <- dt $ nVessels
+  nB <- length ( boatIDs )
+
 
   # recover historic averages to pass to the DEVS function
   histList <- list ( )
@@ -988,6 +1003,8 @@ yearDEVS <- function ( dt = yearAverages, T = nT )
   histList $ minDepth <- -1. *  dt [ , maxDepth ]
   histList $ maxDepth <- -1. * dt [ , minDepth ]
   histList $ meanTows <- round ( dt [ , aveTows ] )
+  histList $ year <- year
+  histList $ tHist <- tHist
 
   # Call boatDEVS function to run DEVS and return states and a FEL
   # for each boat. Parallelised
